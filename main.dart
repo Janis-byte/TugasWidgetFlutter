@@ -1,29 +1,73 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_4/ListView.dart';
-import 'package:flutter_application_4/dateandtimepicker.dart';
-import 'package:flutter_application_4/dialog.dart';
-import 'package:flutter_application_4/image_widget.dart';
-import 'package:flutter_application_4/scaffold.dart';
-import 'package:flutter_application_4/tesScaffold.dart';
-import 'package:flutter_application_4/text_widget.dart';
+import 'package:flutter_simple_calculator/flutter_simple_calculator.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('SimpleCalculator'),
+        ),
+        body: const Padding(
+          padding: EdgeInsets.all(18.0),
+          child: SizedBox(
+            width: double.infinity,
+            child: CalcButton(),
+          ),
+        ),
       ),
-      home: MyApp(),
+    );
+  }
+}
+
+class CalcButton extends StatefulWidget {
+  const CalcButton({Key? key}) : super(key: key);
+
+  @override
+  CalcButtonState createState() => CalcButtonState();
+}
+
+class CalcButtonState extends State<CalcButton> {
+  double? _currentValue = 0;
+  @override
+  Widget build(BuildContext context) {
+    var calc = SimpleCalculator(
+      value: _currentValue!,
+      hideExpression: false,
+      hideSurroundingBorder: true,
+      autofocus: true,
+      onChanged: (key, value, expression) {
+        setState(() {
+          _currentValue = value ?? 0;
+        });
+        if (kDebugMode) {
+          print('$key\t$value\t$expression');
+        }
+      },
+      onTappedDisplay: (value, details) {
+        if (kDebugMode) {
+          print('$value\t${details.globalPosition}');
+        }
+      },
+    );
+    return OutlinedButton(
+      child: Text(_currentValue.toString()),
+      onPressed: () {
+        showModalBottomSheet(
+            isScrollControlled: true,
+            context: context,
+            builder: (BuildContext context) {
+              return SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.75,
+                  child: calc);
+            });
+      },
     );
   }
 }
